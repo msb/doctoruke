@@ -10,12 +10,6 @@ Create a virtual environment (a one-off command):
 virtualenv -p python3.6 venv
 ```
 
-To support music file tagging install the following library (a one-off command):
-
-```
-sudo apt-get install libtag1-dev
-```
-
 Activate the virtual environment (run for every new session):
 
 ```
@@ -36,12 +30,19 @@ doctoruke --help
 
 ## Examples
 
-### Scraping
+### Scraping & Tagging
 
-The main tool scrapes the main page and retrieves all song tracks and PDFs.
-I normally to this can be done with the following command:
+The "scrape" command scrapes the main page and retrieves all song tracks and PDFs.
+I normally to this with the following command:
 
 ```
 doctoruke scrape --song-exclude=incrowdc http://www.doctoruke.com/ "$HOME/Music/Library/0.Doctor Uke/" "$HOME/Documents/Songbooks/Doctor Uke/"
+```
+
+Once scrapes the "tag" command tags the song tracks, using the <song-db> for titles.
+I normally to this with the following command:
+
+```
+doctoruke tag --tag-tracknumber=, --tag-album='The Complete Doctor Uke' --tag-albumartist='Doctor Uke' --tag-artist='Doctor Uke' "$HOME/Music/Library/0.Doctor Uke/"
 ```
 

@@ -14,7 +14,7 @@ setup(
         'docopt',
         'bs4',
         'requests',
-#        'pytaglib'
+        'eyeD3'
     ],
     setup_requires=[
         'pytest-runner',

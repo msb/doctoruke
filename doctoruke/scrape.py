@@ -18,11 +18,12 @@ def main(opts):
                     onclick_parts = onclick.split("'")
                     if onclick_parts[0] == 'window.open(' and onclick_parts[1].endswith('.html'):
                         song_name = retrieve(opts, href, onclick_parts[1])
-                        if song_name not in song_db:
-                            song_db[song_name] = []
-                        song_db[song_name].append(anchor.get_text().strip())
+                        if song_name:
+                            if song_name not in song_db:
+                                song_db[song_name] = []
+                            song_db[song_name].append(anchor.get_text().strip())
 
-    with open(opts['--output-db'], 'w') as song_db_file:
+    with open(opts['--song-db'], 'w') as song_db_file:
         json.dump(song_db, song_db_file, sort_keys=True, indent=4)
 
 
@@ -50,6 +51,7 @@ def retrieve(opts, pdf, page):
                 raise Exception("can't find mp3")
             urllib.request.urlretrieve(url + mp3, song_local)
             print(song_local)
-    return song_name
+        return song_name
+    return None
 
 
