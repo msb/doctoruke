@@ -33,7 +33,7 @@ doctoruke --help
 ### Scraping & Tagging
 
 The "scrape" command scrapes the main page and retrieves all song tracks and PDFs.
-I normally to this with the following command:
+I normally do this with the following command:
 
 ```
 doctoruke scrape --song-exclude=incrowdc http://www.doctoruke.com/ "$HOME/Music/Library/0.Doctor Uke/" "$HOME/Documents/Songbooks/Doctor Uke/"
