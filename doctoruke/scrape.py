@@ -44,9 +44,10 @@ def retrieve(opts, pdf, page):
             soup = BeautifulSoup(response.text, 'html.parser')
             mp3 = None
             for script in soup.find_all("script"):
-                for part in script.get_text().split('"'):
-                    if part.endswith('.mp3'):
-                        mp3 = part
+                if script.string:
+                    for part in script.string.split('"'):
+                        if part.endswith('.mp3'):
+                            mp3 = part
             if not mp3:
                 raise Exception("can't find mp3")
             urllib.request.urlretrieve(url + mp3, song_local)
