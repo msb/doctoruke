@@ -36,7 +36,21 @@ The "scrape" command scrapes the main page and retrieves all song tracks and PDF
 I normally do this with the following command:
 
 ```
-doctoruke scrape --song-exclude=incrowdc,beautifulfreamer http://www.doctoruke.com/ "$CLOUD/Music/Library/0.Doctor Uke/" "$CLOUD/Documents/Songbooks/Doctor Uke/"
+doctoruke scrape http://www.doctoruke.com "$CLOUD/Music/Library/0.Doctor Uke/" "$CLOUD/Documents/Songbooks/Doctor Uke/"
+```
+
+To minimise requests to the website the process saves key page data in file called
+`song-page-cache.json`. If necessary, the downloading of a particular file can be supressed by
+pre-pending it with "!". Eg:
+
+```
+    :
+    "/_player/addamsfamily.html": [
+        "Addams Family Theme",
+        "addamsfamily",
+        "!addamsfamily"
+    ],
+    :
 ```
 
 Once scraped the "tag" command tags the song tracks, using the <song-db> for titles.

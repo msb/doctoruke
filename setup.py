@@ -13,8 +13,9 @@ setup(
     install_requires=[
         'docopt',
         'bs4',
-        'requests',
-        'eyeD3'
+        'httpx',
+        'eyeD3',
+
     ],
     setup_requires=[
         'pytest-runner',
