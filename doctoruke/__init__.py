@@ -27,7 +27,7 @@ Options:
 Sub commands:
 
     scrape  Scrapes the main page and retrieves all song tracks and PDFs.
-    tag     Onced scraped, tags the song tracks, using the <song-db> for titles.
+    tag     Onced scraped, tags the song tracks, using the --song-page-cache for titles.
 
 """
 import logging

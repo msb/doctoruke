@@ -1,6 +1,7 @@
 # Doctor Uke Tools
 
-Tools to help me retrieve song resources from the awesome (http://www.doctoruke.com).
+A set of tools to help me retrieve song resources (PDFs and audio) from the awesome
+(http://www.doctoruke.com).
 
 ## Getting Started
 
@@ -36,7 +37,7 @@ The "scrape" command scrapes the main page and retrieves all song tracks and PDF
 I normally do this with the following command:
 
 ```
-doctoruke scrape http://www.doctoruke.com "$CLOUD/Music/Library/0.Doctor Uke/" "$CLOUD/Documents/Songbooks/Doctor Uke/"
+doctoruke scrape http://www.doctoruke.com "$DOCTORUKE_PDFS" "$DOCTORUKE_AUDIO"
 ```
 
 To minimise requests to the website the process saves key page data in file called
@@ -53,10 +54,10 @@ pre-pending it with "!". Eg:
     :
 ```
 
-Once scraped the "tag" command tags the song tracks, using the <song-db> for titles.
-I normally to this with the following command:
+Once scraped the "tag" command tags the song tracks, using the song page cache file created
+previously for titles. I normally to this with the following command:
 
 ```
-doctoruke tag --tag-tracknumber=, --tag-album='The Complete Doctor Uke' --tag-albumartist='Doctor Uke' --tag-artist='Doctor Uke' "$CLOUD/Music/Library/0.Doctor Uke/"
+doctoruke tag --tag-tracknumber=, --tag-album='The Complete Doctor Uke' \
+  --tag-albumartist='Doctor Uke' --tag-artist='Doctor Uke' "$DOCTORUKE_AUDIO"
 ```
-

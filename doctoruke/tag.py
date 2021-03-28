@@ -8,6 +8,8 @@ LOGGER = logging.getLogger(__name__)
 
 def main(opts):
     """
+    This tool uses the song page cache to update the tags of any new audio files with the correct
+    title and other fixed tag data.
     """
     with open(opts['--song-page-cache']) as song_page_cache_file:
         song_page_cache = json.load(song_page_cache_file)
