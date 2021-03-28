@@ -24,30 +24,24 @@ SCRIPT_REGEX = (
 MAX_CONCURRENT_TASKS = 3
 
 
+async def worker(queue):
+    """
+    A worker method that continually de-queues tasks and executes them
+    """
+    while True:
+        # get an IO task out of the queue
+        awaitable = await queue.get()
+
+        await awaitable
+
+        # notify the queue that the IO task has been processed.
+        queue.task_done()
+
+
 async def main(opts):
     """
     Scrapes the main page and retrieves all song tracks and PDFs.
     """
-
-    # the current batch of running IO tasks
-    task_batch = []
-
-    async def create_task(awaitable=None):
-        """
-        Creates IO task of `awaitable` and adds then to with `task_batch`. If MAX_CONCURRENT_TASKS
-        is reached, all tasks are awaited. If no `awaitable` is given, all remaining tasks are
-        awaited.
-        """
-        nonlocal task_batch
-
-        if awaitable:
-            task_batch.append(asyncio.create_task(awaitable))
-        elif task_batch:
-            await asyncio.gather(*task_batch)
-
-        if len(task_batch) == MAX_CONCURRENT_TASKS:
-            await asyncio.gather(*task_batch)
-            task_batch = []
 
     # loads the song page cache
     try:
@@ -56,27 +50,42 @@ async def main(opts):
     except FileNotFoundError:
         song_page_cache = {}
 
+    # create a queue that we will use to store our tasks
+    queue = asyncio.Queue()
+
+    # create a set of worker tasks to process the queue concurrently
+    tasks = [asyncio.create_task(worker(queue)) for i in range(MAX_CONCURRENT_TASKS)]
+
     async with httpx.AsyncClient() as client:
 
         # reads all new song pages linked in song index page and adds them to the song page cache
 
+        print('scan index for updates..')
+
         for song_page in new_song_pages(opts, song_page_cache):
-            await create_task(
+            queue.put_nowait(
                 read_page(opts['<doctoruke-url>'], song_page_cache, client, song_page)
             )
 
-        await create_task()
+        await queue.join()
 
         # iterates over the song page cache and retrieves all all new song files
 
-        for remote_url, local_path in new_song_files(opts, song_page_cache):
-            await create_task(get_new_file(client, remote_url, local_path))
+        print('retrieve new song files..')
 
-        await create_task()
+        for remote_url, local_path in new_song_files(opts, song_page_cache):
+            queue.put_nowait(get_new_file(client, remote_url, local_path))
+
+        await queue.join()
 
     # saves the song page cache
     with open(opts['--song-page-cache'], 'w') as song_page_cache_file:
         json.dump(song_page_cache, song_page_cache_file, sort_keys=True, indent=4)
+
+    # cancel our worker tasks and wait until they are cancelled
+    for task in tasks:
+        task.cancel()
+    await asyncio.gather(*tasks, return_exceptions=True)
 
 
 def new_song_pages(opts, song_page_cache):
@@ -126,7 +135,6 @@ async def read_page(doctoruke_url, song_page_cache, client, song_page):
     Downloads a song page, parses song data from the page's script tags (title and file names), and
     adds the data to the song page cache.
     """
-    print(song_page)
     try:
         response = await client.get(urljoin(doctoruke_url, song_page))
         response.raise_for_status()
@@ -138,6 +146,7 @@ async def read_page(doctoruke_url, song_page_cache, client, song_page):
                     song_page_data = match.groups()
                     song_page_cache[song_page] = song_page_data
                     break
+        print(song_page)
     except httpx.HTTPError as e:
         print('failed:' + song_page)
         song_page_cache[song_page] = (str(e), '!unknown', '!unknown')
@@ -147,13 +156,13 @@ async def get_new_file(client, remote_url, local_path):
     """
     Downloads a song file from Doctor Uke.
     """
-    print(local_path)
     try:
         with open(local_path, 'wb') as f:
             async with client.stream('GET', remote_url) as response:
                 response.raise_for_status()
                 async for chunk in response.aiter_bytes():
                     f.write(chunk)
+        print(local_path)
     except httpx.HTTPError as e:
         print(f'{local_path} failed: {e}')
         os.remove(local_path)
