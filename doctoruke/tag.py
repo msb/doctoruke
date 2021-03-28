@@ -1,6 +1,9 @@
 import os
+import logging
 import json
 import eyed3
+
+LOGGER = logging.getLogger(__name__)
 
 
 def main(opts):
@@ -14,7 +17,7 @@ def main(opts):
             song = eyed3.load(os.path.join(opts['<song-dir>'], song_name + '.mp3')).tag
             if song.title != song_title:
                 song.title = song_title
-                print(song_title)
+                LOGGER.info(song_title)
                 if '--tag-tracknumber' in opts:
                     track_num = opts['--tag-tracknumber'].split(',')
                     song.track_num = (none(track_num[0]), none(track_num[1]))

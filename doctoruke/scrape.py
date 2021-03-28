@@ -1,10 +1,13 @@
-import httpx
+import logging
+import os
 import re
 import json
-import os
 import asyncio
+import httpx
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse, urljoin
+
+LOGGER = logging.getLogger(__name__)
 
 # doctoruke's main index
 INDEX_PAGE = 'songs.html'
@@ -60,7 +63,7 @@ async def main(opts):
 
         # reads all new song pages linked in song index page and adds them to the song page cache
 
-        print('scan index for updates..')
+        LOGGER.info('scan index for updates..')
 
         for song_page in new_song_pages(opts, song_page_cache):
             queue.put_nowait(
@@ -71,7 +74,7 @@ async def main(opts):
 
         # iterates over the song page cache and retrieves all all new song files
 
-        print('retrieve new song files..')
+        LOGGER.info('retrieve new song files..')
 
         for remote_url, local_path in new_song_files(opts, song_page_cache):
             queue.put_nowait(get_new_file(client, remote_url, local_path))
@@ -146,9 +149,9 @@ async def read_page(doctoruke_url, song_page_cache, client, song_page):
                     song_page_data = match.groups()
                     song_page_cache[song_page] = song_page_data
                     break
-        print(song_page)
+        LOGGER.info(song_page)
     except httpx.HTTPError as e:
-        print('failed:' + song_page)
+        LOGGER.error('failed:' + song_page)
         song_page_cache[song_page] = (str(e), '!unknown', '!unknown')
 
 
@@ -162,7 +165,7 @@ async def get_new_file(client, remote_url, local_path):
                 response.raise_for_status()
                 async for chunk in response.aiter_bytes():
                     f.write(chunk)
-        print(local_path)
+        LOGGER.info(local_path)
     except httpx.HTTPError as e:
-        print(f'{local_path} failed: {e}')
+        LOGGER.error(f'{local_path} failed: {e}')
         os.remove(local_path)

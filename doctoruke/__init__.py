@@ -37,10 +37,14 @@ import asyncio
 
 def main():
     opts = docopt.docopt(__doc__)
-    logging.basicConfig(level=logging.INFO if opts['--verbose'] else logging.WARN)
+    logging.basicConfig(level=logging.DEBUG if opts['--verbose'] else logging.INFO)
     if opts['scrape']:
         from . import scrape
         asyncio.run(scrape.main(opts))
     if opts['tag']:
+        if not opts['--verbose']:
+            # suppress spurious warnings from eyed3
+            logger = logging.getLogger('eyed3.mp3.headers')
+            logger.setLevel(logging.ERROR)
         from . import tag
         tag.main(opts)
