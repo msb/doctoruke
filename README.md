@@ -37,7 +37,7 @@ The "scrape" command scrapes the main page and retrieves all song tracks and PDF
 I normally do this with the following command:
 
 ```
-doctoruke scrape http://www.doctoruke.com "$DOCTORUKE_PDFS" "$DOCTORUKE_AUDIO"
+doctoruke scrape https://www.doctoruke.com "$DOCTORUKE_AUDIO" "$DOCTORUKE_PDFS"
 ```
 
 To minimise requests to the website the process saves key page data in file called
@@ -58,6 +58,6 @@ Once scraped the "tag" command tags the song tracks, using the song page cache f
 previously for titles. I normally to this with the following command:
 
 ```
-doctoruke tag --tag-tracknumber=, --tag-album='The Complete Doctor Uke' \
+doctoruke tag --tag-tracknumber=',' --tag-album='The Complete Doctor Uke' \
   --tag-albumartist='Doctor Uke' --tag-artist='Doctor Uke' "$DOCTORUKE_AUDIO"
 ```

@@ -72,7 +72,7 @@ async def main(opts):
 
         await queue.join()
 
-        # iterates over the song page cache and retrieves all all new song files
+        # iterates over the song page cache and retrieves all new song files
 
         LOGGER.info('retrieve new song files..')
 
